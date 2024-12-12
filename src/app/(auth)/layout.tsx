@@ -16,7 +16,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
 
   return (
     <main className="bg-neutral-100 min-h-screen">
-      <div className="mx-auto max-w-screen-xl p-4">
+      <div className="mx-auto max-w-screen-xl p-2">
         <nav className="flex justify-between items-center">
           <Image src="/logo.svg" width={152} height={56} alt="Logo" />
           <Button asChild variant="secondary">
@@ -26,7 +26,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
           </Button>
         </nav>
 
-        <div className="flex flex-col items-center justify-center pt-4 md:pt-14">
+        <div className="flex flex-col items-center justify-center pt-2 md:pt-14">
           {children}
         </div>
       </div>
