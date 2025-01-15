@@ -31,6 +31,9 @@ const app = new Hono().post(
         IMAGES_BUCKET_ID,
         file.$id
       );
+      uploadedImageUrl = `data:image/png;base64,${Buffer.from(
+        arrayBuffer
+      ).toString("base64")}`;
     }
 
     const workspace = await databases.createDocument(
@@ -40,6 +43,7 @@ const app = new Hono().post(
       {
         name,
         userId: user.$id,
+        imageUrl: uploadedImageUrl,
       }
     );
 
