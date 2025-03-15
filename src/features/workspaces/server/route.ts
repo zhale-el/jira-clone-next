@@ -15,6 +15,7 @@ import {
 } from "@/config";
 
 import { createWorkspaceSchema, updateWorkspaceSchema } from "../schemas";
+import { error } from "console";
 
 const app = new Hono()
   .get("/", sessionMiddleware, async (c) => {
@@ -110,7 +111,7 @@ const app = new Hono()
       if (!member || member.role !== MemberRole.ADMIN) {
         return c.json({ error: "Unauthorized" }, 401);
       }
-      
+
       let uploadedImageUrl: string | undefined;
 
       if (image instanceof File) {
@@ -127,21 +128,39 @@ const app = new Hono()
         uploadedImageUrl = `data:image/png;base64,${Buffer.from(
           arrayBuffer
         ).toString("base64")}`;
+      } else {
+        uploadedImageUrl = image;
       }
-      else{
-        uploadedImageUrl=image
-      }
-      const workspace=await databases.updateDocument(
+      const workspace = await databases.updateDocument(
         DATABASE_ID,
         WORKSPACES_ID,
         workspaceId,
         {
           name,
-          imageUrl:uploadedImageUrl
+          imageUrl: uploadedImageUrl,
         }
       );
-      return c.json({data:workspace})
+      return c.json({ data: workspace });
     }
-  );
+  )
+  .delete("/:workspaceId", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const { workspaceId } = c.req.param();
+
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    });
+
+    if (!member || member.role !== MemberRole.ADMIN) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    await databases.deleteDocument(DATABASE_ID, WORKSPACES_ID, workspaceId);
+    return c.json({ data: { $id: workspaceId } });
+  });
 
 export default app;
