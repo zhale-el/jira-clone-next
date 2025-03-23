@@ -36,9 +36,9 @@ const app = new Hono()
     const workspaces = await databases.listDocuments(
       DATABASE_ID,
       WORKSPACES_ID,
-
       [Query.orderDesc("$createdAt"), Query.contains("$id", workspaceIds)]
     );
+
     return c.json({ data: workspaces });
   })
   .post(
@@ -65,6 +65,7 @@ const app = new Hono()
           IMAGES_BUCKET_ID,
           file.$id
         );
+
         uploadedImageUrl = `data:image/png;base64,${Buffer.from(
           arrayBuffer
         ).toString("base64")}`;
@@ -126,12 +127,14 @@ const app = new Hono()
           IMAGES_BUCKET_ID,
           file.$id
         );
+
         uploadedImageUrl = `data:image/png;base64,${Buffer.from(
           arrayBuffer
         ).toString("base64")}`;
       } else {
         uploadedImageUrl = image;
       }
+
       const workspace = await databases.updateDocument(
         DATABASE_ID,
         WORKSPACES_ID,
@@ -141,6 +144,7 @@ const app = new Hono()
           imageUrl: uploadedImageUrl,
         }
       );
+
       return c.json({ data: workspace });
     }
   )
@@ -187,6 +191,7 @@ const app = new Hono()
         inviteCode: generateInviteCode(6),
       }
     );
+
     return c.json({ data: workspace });
   })
   .post(
@@ -225,6 +230,7 @@ const app = new Hono()
         userId: user.$id,
         role: MemberRole.MEMBER,
       });
+
       return c.json({ data: workspace });
     }
   );

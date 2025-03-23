@@ -40,6 +40,7 @@ export const getWorkspaces = async () => {
 
 interface GetWorkspaceProps {
   workspaceId: string;
+  inviteCode: string;
 }
 
 export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps) => {
