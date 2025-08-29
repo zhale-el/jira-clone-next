@@ -15,6 +15,7 @@ export async function createSessionClient() {
   if (!session || !session.value) {
     throw new Error("Unauthorized");
   }
+
   client.setSession(session.value);
 
   return {
@@ -27,7 +28,7 @@ export async function createSessionClient() {
   };
 }
 
-export async function createAdminiClient() {
+export async function createAdminClient() {
   const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!)

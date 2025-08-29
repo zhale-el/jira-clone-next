@@ -1,13 +1,14 @@
-import { Hono } from "hono";
 import { z } from "zod";
+import { Hono } from "hono";
+import { Query } from "node-appwrite";
 import { zValidator } from "@hono/zod-validator";
 
-import { createAdminiClient } from "@/lib/appwrite";
-import { sessionMiddleware } from "@/lib/session-middleware";
-import { getMember } from "../utils";
+import { createAdminClient } from "@/lib/appwrite";
 import { DATABASE_ID, MEMBERS_ID } from "@/config";
-import { Query } from "node-appwrite";
-import { MemberRole } from "../types";
+import { sessionMiddleware } from "@/lib/session-middleware";
+
+import { getMember } from "../utils";
+import { Member, MemberRole } from "../types";
 
 const app = new Hono()
   .get(
@@ -15,7 +16,7 @@ const app = new Hono()
     sessionMiddleware,
     zValidator("query", z.object({ workspaceId: z.string() })),
     async (c) => {
-      const { users } = await createAdminiClient();
+      const { users } = await createAdminClient();
       const databases = c.get("databases");
       const user = c.get("user");
       const { workspaceId } = c.req.valid("query");
@@ -30,16 +31,19 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
-        Query.equal("workspaceId", workspaceId),
-      ]);
+      const members = await databases.listDocuments<Member>(
+        DATABASE_ID,
+        MEMBERS_ID,
+        [Query.equal("workspaceId", workspaceId)]
+      );
+
       const populatedMembers = await Promise.all(
         members.documents.map(async (member) => {
           const user = await users.get(member.userId);
 
           return {
             ...member,
-            name: user.name,
+            name: user.name || user.email,
             email: user.email,
           };
         })
@@ -79,6 +83,7 @@ const app = new Hono()
     if (!member) {
       return c.json({ error: "Unauthorized" }, 401);
     }
+
     if (member.$id !== memberToDelete.$id && member.role !== MemberRole.ADMIN) {
       return c.json({ error: "Unauthorized" }, 401);
     }
@@ -122,6 +127,7 @@ const app = new Hono()
       if (!member) {
         return c.json({ error: "Unauthorized" }, 401);
       }
+
       if (member.role !== MemberRole.ADMIN) {
         return c.json({ error: "Unauthorized" }, 401);
       }
