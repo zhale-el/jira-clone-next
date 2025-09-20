@@ -1,16 +1,21 @@
 "use client";
 
+import { z } from "zod";
+import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import Link from "next/link";
-
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { signUpWithGithub, signUpWithGoogle } from "@/lib/oauth";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -19,10 +24,11 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { loginSchema } from "@/features/auth/schemas";
+
+import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
 
-export const SingInCard = () => {
+export const SignInCard = () => {
   const { mutate, isPending } = useLogin();
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -39,11 +45,13 @@ export const SingInCard = () => {
 
   return (
     <Card className="w-full h-full md:w-[487px] border-none shadow-none">
-      <CardHeader className="flex items-center justify-center p-7">
-        <CardTitle className="text-2xl">Welcome back!</CardTitle>
+      <CardHeader className="flex items-center justify-center text-center p-7">
+        <CardTitle className="text-2xl">
+          Welcome back!
+        </CardTitle>
       </CardHeader>
       <div className="px-7">
-        <DottedSeparator />
+        <DottedSeparator  />
       </div>
       <CardContent className="p-7">
         <Form {...form}>
@@ -80,19 +88,18 @@ export const SingInCard = () => {
                 </FormItem>
               )}
             />
-
             <Button disabled={isPending} size="lg" className="w-full">
               Login
             </Button>
           </form>
         </Form>
       </CardContent>
-
       <div className="px-7">
         <DottedSeparator />
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
         <Button
+          onClick={() => signUpWithGoogle()}
           disabled={isPending}
           variant="secondary"
           size="lg"
@@ -102,6 +109,7 @@ export const SingInCard = () => {
           Login with Google
         </Button>
         <Button
+          onClick={() => signUpWithGithub()}
           disabled={isPending}
           variant="secondary"
           size="lg"
